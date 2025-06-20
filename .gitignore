@@ -1,0 +1,24 @@
+# IDE (GoLand, VSCode и другие)
+.idea/
+.vscode/
+
+# Go build
+*.exe
+*.out
+*.test
+
+# Скомпилированные бинарники
+/bin/
+/build/
+/dist/
+
+# Кэш и временные файлы
+*.log
+*.tmp
+
+# Библиотеки и зависимости
+vendor/
+
+# Файлы окружения
+.env
+.env.local
