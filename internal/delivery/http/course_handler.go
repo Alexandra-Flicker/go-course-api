@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 	"newProject_courses/internal/service"
@@ -67,20 +68,20 @@ func (h *CourseHandler) CreateCourse(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CourseHandler) UpdateDescriptionByID(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
 	var input struct {
-		ID          int    `json:"id"`
 		Description string `json:"description"`
 	}
-	err := json.NewDecoder(r.Body).Decode(&input)
+	err = json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, "failed to decode request", http.StatusBadRequest)
 	}
 	input.Description = strings.TrimSpace(input.Description)
-
-	if input.ID <= 0 {
-		http.Error(w, "invalid ID", http.StatusBadRequest)
-		return
-	}
 	if len(input.Description) == 0 {
 		http.Error(w, "description is required", http.StatusBadRequest)
 		return
@@ -89,7 +90,7 @@ func (h *CourseHandler) UpdateDescriptionByID(w http.ResponseWriter, r *http.Req
 		http.Error(w, "description is too long", http.StatusBadRequest)
 		return
 	}
-	err = h.service.UpdateDescriptionByID(input.Description, input.ID)
+	err = h.service.UpdateDescriptionByID(input.Description, id)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -99,7 +100,7 @@ func (h *CourseHandler) UpdateDescriptionByID(w http.ResponseWriter, r *http.Req
 }
 
 func (h *CourseHandler) GetCourseByID(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Query().Get("id")
+	idStr := chi.URLParam(r, "id")
 	//валидация idStr
 	if idStr == "" {
 		log.Println("missing 'id' parameter in query")
@@ -128,7 +129,7 @@ func (h *CourseHandler) GetCourseByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CourseHandler) DeleteCourseByID(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Query().Get("id")
+	idStr := chi.URLParam(r, "id")
 	if idStr == "" {
 		log.Println("missing 'id' parameter in query")
 		http.Error(w, "id is required", http.StatusBadRequest)
