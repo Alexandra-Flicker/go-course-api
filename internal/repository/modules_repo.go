@@ -23,7 +23,7 @@ func NewModuleRepo(db *sqlx.DB) ModulesRepo {
 
 func (m *modulesRepo) CreateModule(module entity.Module) error {
 	query := "INSERT INTO modules (course_id, title, created_at, updated_at) VALUES ($1, $2, now(), now())"
-	_, err := m.db.Exec(query, module.CourseID, module.Title, module.CreatedAT, module.UpdatedAT)
+	_, err := m.db.Exec(query, module.CourseID, module.Title)
 	return err
 }
 

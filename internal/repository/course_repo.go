@@ -16,7 +16,7 @@ type courseRepo struct {
 	db *sqlx.DB
 }
 
-// конструктор
+// constructor
 func NewCourseRepo(db *sqlx.DB) CourseRepo {
 	return &courseRepo{db}
 }

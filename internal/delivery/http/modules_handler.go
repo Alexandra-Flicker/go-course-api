@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 	"newProject_courses/internal/entity"
@@ -63,7 +64,7 @@ func (h *ModuleHandler) GetAllModules(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (h *ModuleHandler) GetModuleByID(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Query().Get("id")
+	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "failed to parse id", http.StatusBadRequest)
@@ -105,7 +106,7 @@ func (h *ModuleHandler) UpdateModuleTitleByID(w http.ResponseWriter, r *http.Req
 }
 
 func (h *ModuleHandler) DeleteModuleByID(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Query().Get("id")
+	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "failed to parse id", http.StatusBadRequest)

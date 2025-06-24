@@ -27,6 +27,20 @@ func main() {
 		r.Put("/{id}", courseHandler.UpdateDescriptionByID)
 		r.Delete("/{id}", courseHandler.DeleteCourseByID)
 	})
+
+	moduleRepo := repository.NewModuleRepo(db)
+	moduleService := service.NewModuleService(moduleRepo)
+	moduleHandler := handler.NewModuleHandler(moduleService)
+
+	r.Route("/modules", func(r chi.Router) {
+		r.Post("/", moduleHandler.CreateModule)
+		r.Get("/", moduleHandler.GetAllModules)
+		r.Get("/{id}", moduleHandler.GetModuleByID)
+		r.Put("/{id}", moduleHandler.UpdateModuleTitleByID)
+		r.Delete("/{id}", moduleHandler.DeleteModuleByID)
+
+	})
+
 	log.Println("Server running on:8080")
 	err := http.ListenAndServe(cfg.Server.Port, r)
 	if err != nil {
