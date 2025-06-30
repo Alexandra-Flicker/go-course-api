@@ -41,6 +41,18 @@ func main() {
 
 	})
 
+	lessonRepo := repository.NewLessonRepo(db)
+	lessonService := service.NewLessonService(lessonRepo)
+	lessonHandler := handler.NewLessonHandler(lessonService)
+
+	r.Route("/lessons", func(r chi.Router) {
+		r.Post("/", lessonHandler.CreateLesson)
+		r.Get("/", lessonHandler.GetAllLessons)
+		r.Get("/{id}", lessonHandler.GetLessonByID)
+		r.Put("/{id}", lessonHandler.UpdateLessonByID)
+		r.Delete("/{id}", lessonHandler.DeleteLessonByID)
+	})
+
 	log.Println("Server running on:8080")
 	err := http.ListenAndServe(cfg.Server.Port, r)
 	if err != nil {
