@@ -1,24 +1,24 @@
-package http
+package course
 
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
-	"newProject_courses/internal/service"
+	"newProject_courses/internal/domain/course"
 	"strconv"
 	"strings"
 )
 
-type CourseHandler struct {
-	service service.CourseService
+type Handler struct {
+	service course.Service
 }
 
-func NewCourseHandler(s service.CourseService) *CourseHandler {
-	return &CourseHandler{service: s}
+func NewCourseHandler(s course.Service) *Handler {
+	return &Handler{service: s}
 }
 
-func (h *CourseHandler) GetAll(w http.ResponseWriter, _ *http.Request) {
+func (h *Handler) GetAll(w http.ResponseWriter, _ *http.Request) {
 	courses, err := h.service.GetAll()
 	if err != nil {
 		log.Println("error getting courses:", err)
@@ -34,7 +34,7 @@ func (h *CourseHandler) GetAll(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
-func (h *CourseHandler) CreateCourse(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateCourse(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name        string `json:"name"`
 		Description string `json:"description"`
@@ -67,7 +67,7 @@ func (h *CourseHandler) CreateCourse(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *CourseHandler) UpdateDescriptionByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) UpdateDescriptionByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id <= 0 {
@@ -99,7 +99,7 @@ func (h *CourseHandler) UpdateDescriptionByID(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *CourseHandler) GetCourseByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetCourseByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	//валидация idStr
 	if idStr == "" {
@@ -128,7 +128,7 @@ func (h *CourseHandler) GetCourseByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *CourseHandler) DeleteCourseByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteCourseByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	if idStr == "" {
 		log.Println("missing 'id' parameter in query")

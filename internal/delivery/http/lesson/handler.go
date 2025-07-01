@@ -1,25 +1,24 @@
-package http
+package lesson
 
 import (
 	"encoding/json"
 	"net/http"
+	"newProject_courses/internal/domain/lesson"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"newProject_courses/internal/entity"
-	"newProject_courses/internal/service"
 )
 
-type LessonHandler struct {
-	service service.LessonService
+type Handler struct {
+	service lesson.Service
 }
 
-func NewLessonHandler(service service.LessonService) *LessonHandler {
-	return &LessonHandler{service: service}
+func NewLessonHandler(service lesson.Service) *Handler {
+	return &Handler{service: service}
 }
 
-func (h *LessonHandler) CreateLesson(w http.ResponseWriter, r *http.Request) {
-	var input entity.Lesson
+func (h *Handler) CreateLesson(w http.ResponseWriter, r *http.Request) {
+	var input lesson.Lesson
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "invalid input: "+err.Error(), http.StatusBadRequest)
 		return
@@ -33,7 +32,7 @@ func (h *LessonHandler) CreateLesson(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *LessonHandler) GetLessonByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetLessonByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -41,20 +40,20 @@ func (h *LessonHandler) GetLessonByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lesson, err := h.service.GetLessonByID(id)
+	lessonResponse, err := h.service.GetLessonByID(id)
 	if err != nil {
 		http.Error(w, "lesson not found: "+err.Error(), http.StatusNotFound)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(lesson)
+	err = json.NewEncoder(w).Encode(lessonResponse)
 	if err != nil {
 		http.Error(w, "failed to marshal lesson: "+err.Error(), http.StatusInternalServerError)
 	}
 }
 
-func (h *LessonHandler) GetAllLessons(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetAllLessons(w http.ResponseWriter, _ *http.Request) {
 	lessons, err := h.service.GetAllLessons()
 	if err != nil {
 		http.Error(w, "failed to fetch lessons: "+err.Error(), http.StatusInternalServerError)
@@ -68,7 +67,7 @@ func (h *LessonHandler) GetAllLessons(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *LessonHandler) UpdateLessonByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) UpdateLessonByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -76,7 +75,7 @@ func (h *LessonHandler) UpdateLessonByID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	var input entity.Lesson
+	var input lesson.Lesson
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "invalid input: "+err.Error(), http.StatusBadRequest)
 		return
@@ -90,7 +89,7 @@ func (h *LessonHandler) UpdateLessonByID(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *LessonHandler) DeleteLessonByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteLessonByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {

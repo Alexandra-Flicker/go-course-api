@@ -1,24 +1,23 @@
-package http
+package module
 
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
-	"newProject_courses/internal/entity"
-	"newProject_courses/internal/service"
+	"newProject_courses/internal/domain/module"
 	"strconv"
 )
 
-type ModuleHandler struct {
-	service service.ModuleService
+type Handler struct {
+	service module.Service
 }
 
-func NewModuleHandler(s service.ModuleService) *ModuleHandler {
-	return &ModuleHandler{service: s}
+func NewModuleHandler(s module.Service) *Handler {
+	return &Handler{service: s}
 }
 
-func (h *ModuleHandler) CreateModule(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateModule(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		CourseID int    `json:"course_id"`
 		Title    string `json:"title"`
@@ -30,7 +29,7 @@ func (h *ModuleHandler) CreateModule(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to decode request", http.StatusBadRequest)
 		return
 	}
-	module := entity.Module{
+	module := module.Module{
 		CourseID: input.CourseID,
 		Title:    input.Title,
 	}
@@ -47,7 +46,7 @@ func (h *ModuleHandler) CreateModule(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *ModuleHandler) GetAllModules(w http.ResponseWriter, _ *http.Request) {
+func (h *Handler) GetAllModules(w http.ResponseWriter, _ *http.Request) {
 	modules, err := h.service.GetAllModules()
 	if err != nil {
 		http.Error(w, "failed to get modules", http.StatusInternalServerError)
@@ -63,7 +62,7 @@ func (h *ModuleHandler) GetAllModules(w http.ResponseWriter, _ *http.Request) {
 
 }
 
-func (h *ModuleHandler) GetModuleByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetModuleByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -84,7 +83,7 @@ func (h *ModuleHandler) GetModuleByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *ModuleHandler) UpdateModuleTitleByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) UpdateModuleTitleByID(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Title string `json:"title"`
 		ID    int    `json:"id"`
@@ -96,7 +95,7 @@ func (h *ModuleHandler) UpdateModuleTitleByID(w http.ResponseWriter, r *http.Req
 		http.Error(w, "failed to decode request", http.StatusBadRequest)
 		return
 	}
-	err = h.service.UpdateModuleTitleByID(input.ID, entity.Module{Title: input.Title})
+	err = h.service.UpdateModuleTitleByID(input.ID, module.Module{Title: input.Title})
 	if err != nil {
 		log.Printf("failed to update module: %v", err)
 		http.Error(w, "failed to update module", http.StatusNotFound)
@@ -105,7 +104,7 @@ func (h *ModuleHandler) UpdateModuleTitleByID(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *ModuleHandler) DeleteModuleByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteModuleByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {

@@ -5,9 +5,16 @@ import (
 	"log"
 	"net/http"
 	"newProject_courses/config"
-	handler "newProject_courses/internal/delivery/http"
+	course2 "newProject_courses/internal/delivery/http/course"
+	handler "newProject_courses/internal/delivery/http/lesson"
+	module2 "newProject_courses/internal/delivery/http/module"
+	"newProject_courses/internal/domain/course"
+	"newProject_courses/internal/domain/lesson"
+	"newProject_courses/internal/domain/module"
 	"newProject_courses/internal/repository"
-	"newProject_courses/internal/service"
+	courserepo "newProject_courses/internal/repository/pgx/course"
+	lessonrepo "newProject_courses/internal/repository/pgx/lesson"
+	modulerepo "newProject_courses/internal/repository/pgx/module"
 )
 
 func main() {
@@ -16,9 +23,9 @@ func main() {
 	db := repository.InitDB(cfg.DB.DSN)
 	r := chi.NewRouter()
 
-	courseRepo := repository.NewCourseRepo(db)
-	courseService := service.NewCourseService(courseRepo)
-	courseHandler := handler.NewCourseHandler(courseService)
+	courseRepo := courserepo.NewCourseRepo(db)
+	courseService := course.NewCourseService(courseRepo)
+	courseHandler := course2.NewCourseHandler(courseService)
 
 	r.Route("/courses", func(r chi.Router) {
 		r.Get("/", courseHandler.GetAll)
@@ -28,9 +35,9 @@ func main() {
 		r.Delete("/{id}", courseHandler.DeleteCourseByID)
 	})
 
-	moduleRepo := repository.NewModuleRepo(db)
-	moduleService := service.NewModuleService(moduleRepo)
-	moduleHandler := handler.NewModuleHandler(moduleService)
+	moduleRepo := modulerepo.NewModuleRepo(db)
+	moduleService := module.NewModuleService(moduleRepo)
+	moduleHandler := module2.NewModuleHandler(moduleService)
 
 	r.Route("/modules", func(r chi.Router) {
 		r.Post("/", moduleHandler.CreateModule)
@@ -41,8 +48,8 @@ func main() {
 
 	})
 
-	lessonRepo := repository.NewLessonRepo(db)
-	lessonService := service.NewLessonService(lessonRepo)
+	lessonRepo := lessonrepo.NewLessonRepo(db)
+	lessonService := lesson.NewLessonService(lessonRepo)
 	lessonHandler := handler.NewLessonHandler(lessonService)
 
 	r.Route("/lessons", func(r chi.Router) {
