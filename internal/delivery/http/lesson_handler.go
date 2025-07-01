@@ -48,7 +48,10 @@ func (h *LessonHandler) GetLessonByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(lesson)
+	err = json.NewEncoder(w).Encode(lesson)
+	if err != nil {
+		http.Error(w, "failed to marshal lesson: "+err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (h *LessonHandler) GetAllLessons(w http.ResponseWriter, r *http.Request) {
@@ -59,7 +62,10 @@ func (h *LessonHandler) GetAllLessons(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(lessons)
+	err = json.NewEncoder(w).Encode(lessons)
+	if err != nil {
+		http.Error(w, "failed to marshal lessons: "+err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (h *LessonHandler) UpdateLessonByID(w http.ResponseWriter, r *http.Request) {
