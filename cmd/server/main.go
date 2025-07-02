@@ -20,7 +20,6 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
-	log.Println(cfg)
 
 	db := repository.InitDB(cfg.DB.DSN)
 	migrations.MustRunMigrations(cfg.DB.DSN)
