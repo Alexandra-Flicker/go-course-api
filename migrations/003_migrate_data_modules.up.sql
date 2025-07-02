@@ -6,6 +6,5 @@ INSERT INTO public.modules (id, course_id, title, created_at, updated_at) VALUES
 INSERT INTO public.modules (id, course_id, title, created_at, updated_at) VALUES (6, 2, 'Memory Management and Escape Analysis', '2025-06-24 12:58:37.798224', '2025-06-24 12:58:37.798224');
 
 -- +goose Down
--- no down
 
 

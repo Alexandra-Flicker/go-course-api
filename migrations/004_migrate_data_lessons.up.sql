@@ -5,4 +5,3 @@ INSERT INTO public.lessons (id, module_id, title, content, created_at, updated_a
 INSERT INTO public.lessons (id, module_id, title, content, created_at, updated_at) VALUES (8, 4, 'Using Mutex in Go', 'Learn how to synchronize access to shared resources using sync.Mutex.', '2025-06-30 18:40:22.598820', '2025-06-30 18:40:22.598820');
 INSERT INTO public.lessons (id, module_id, title, content, created_at, updated_at) VALUES (9, 5, 'Escape Analysis in Go', 'Understand memory allocation and escape analysis for optimization.', '2025-06-30 18:40:30.748267', '2025-06-30 18:40:30.748267');
 -- +goose Down
--- no down
