@@ -1,29 +1,31 @@
-# Используем базовый образ golang для сборки приложения
-FROM golang:1.23-alpine AS build
+# Этап сборки
+FROM golang:1.24-alpine AS builder
 
-# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем файлы зависимостей
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Копируем все исходные файлы приложения
 COPY . .
 
-# Собираем приложение
-WORKDIR /app/cmd/server/main
-RUN go build -o main .
+WORKDIR /app/cmd/server
+RUN go build -o app
 
-# Финальный образ на основе Alpine для уменьшения размера
+# Финальный образ
 FROM alpine:latest
 
-# Копируем исполняемый файл приложения
-COPY --from=build /app/cmd/server/main /app/main
+RUN apk add --no-cache postgresql-client
 
-# Копируем миграции базы данных
-#COPY --from=build /app/db/migrations /app/db/migrations
+WORKDIR /app
 
-# Устанавливаем команду по умолчанию для запуска приложения
-CMD ["/app/main"]
+# Копируем бинарник
+COPY --from=builder /app/cmd/server/app /app/app
 
+# Копируем миграции из корня проекта
+COPY --from=builder /app/migrations /app/migrations
+
+# Копируем sh скрипт ожидания подключения к БД и выставляем права на файл
+COPY wait-for-postgres.sh /wait-for-postgres.sh
+RUN chmod +x /wait-for-postgres.sh
+
+CMD ["/wait-for-postgres.sh", "db", "/app/app"]

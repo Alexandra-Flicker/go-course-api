@@ -15,12 +15,15 @@ import (
 	courserepo "newProject_courses/internal/repository/pgx/course"
 	lessonrepo "newProject_courses/internal/repository/pgx/lesson"
 	modulerepo "newProject_courses/internal/repository/pgx/module"
+	"newProject_courses/migrations"
 )
 
 func main() {
 	cfg := config.LoadConfig()
+	log.Println(cfg)
 
 	db := repository.InitDB(cfg.DB.DSN)
+	migrations.MustRunMigrations(cfg.DB.DSN)
 
 	// Init repo
 	courseRepo := courserepo.NewCourseRepo(db)

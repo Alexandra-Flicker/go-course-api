@@ -9,7 +9,7 @@ import (
 func InitDB(dsn string) *sqlx.DB {
 	db, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("sqlx.Connect", err)
 	}
 
 	return db

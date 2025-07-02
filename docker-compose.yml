@@ -1,31 +1,36 @@
 version: '3.8'
 
 services:
-
   db:
     image: postgres:latest
     container_name: go-db-container
-    restart: always
     ports:
       - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: qwerty
       POSTGRES_DB: goDB
-
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   app:
     build: .
     container_name: go-app-container
     ports:
       - "8080:8080"
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=qwerty
-      - DB_NAME=goDB
     depends_on:
       - db
-    restart: always
+    environment:
+      DB_DSN: postgres://postgres:qwerty@db:5432/goDB?sslmode=disable
+      DB_USER: postgres
+      DB_PASSWORD: qwerty
+      DB_NAME: goDB
+      SERVER_PORT: ":8080"
 
+volumes:
+  postgres_data:
